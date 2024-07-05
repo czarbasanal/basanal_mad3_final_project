@@ -1,5 +1,6 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:basanal_mad3_final_project/auth/login_screen.dart';
-import 'package:basanal_mad3_final_project/auth/register_screen.dart';
+import 'package:basanal_mad3_final_project/auth/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,7 +8,7 @@ import '../routing/router.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const String route = "/";
-  static const String name = "Onboarding Screen";
+  static const String name = "Onboarding";
   const OnboardingScreen({super.key});
 
   @override
@@ -24,30 +25,108 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
-      body: Center(
+      body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Map Journal App',
-              style: TextStyle(
-                fontSize: 32,
-                color: Colors.black,
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        FadeInUp(
+                            duration: Duration(milliseconds: 1000),
+                            child: Text(
+                              "Welcome",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 30),
+                            )),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        FadeInUp(
+                            duration: Duration(milliseconds: 1200),
+                            child: Text(
+                              "Automatic identity verification which enables you to verify your identity",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.grey[700], fontSize: 15),
+                            )),
+                      ],
+                    ),
+                    FadeInUp(
+                        duration: Duration(milliseconds: 1400),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                      'lib/assets/Illustration.png'))),
+                        )),
+                    Column(
+                      children: <Widget>[
+                        FadeInUp(
+                            duration: Duration(milliseconds: 1500),
+                            child: MaterialButton(
+                              minWidth: double.infinity,
+                              height: 60,
+                              onPressed: () {
+                                //login route
+                                GlobalRouter.I.router.go(LoginScreen.route);
+                              },
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 18),
+                              ),
+                            )),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        FadeInUp(
+                            duration: Duration(milliseconds: 1600),
+                            child: Container(
+                              padding: EdgeInsets.only(top: 3, left: 3),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border(
+                                    bottom: BorderSide(color: Colors.black),
+                                    top: BorderSide(color: Colors.black),
+                                    left: BorderSide(color: Colors.black),
+                                    right: BorderSide(color: Colors.black),
+                                  )),
+                              child: MaterialButton(
+                                minWidth: double.infinity,
+                                height: 60,
+                                onPressed: () {
+                                  //sign up route
+                                  GlobalRouter.I.router.go(SignupScreen.route);
+                                },
+                                color: Colors.yellow,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: Text(
+                                  "Sign up",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ))
+                      ],
+                    )
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                GlobalRouter.I.router.go(RegisterScreen.route);
-              },
-              child: Text('Sign up with email'),
-            ),
-            SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {
-                GlobalRouter.I.router.go(LoginScreen.route);
-              },
-              child: Text('Continue with google'),
             ),
           ],
         ),

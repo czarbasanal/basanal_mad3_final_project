@@ -10,16 +10,16 @@ import 'package:go_router/go_router.dart';
 
 import '../routing/router.dart';
 
-class RegisterScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
   static const String route = "/register";
   static const String name = "Register";
-  const RegisterScreen({super.key});
+  const SignupScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   late GlobalKey<FormState> formKey;
   late TextEditingController email, password, confirmPassword;
   late FocusNode emailFn, passwordFn, confirmPasswordFn;

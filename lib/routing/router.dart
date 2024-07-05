@@ -5,7 +5,7 @@ import "package:go_router/go_router.dart";
 
 import "../auth/login_screen.dart";
 import "../auth/onboarding_screen.dart";
-import "../auth/register_screen.dart";
+import "../auth/signup_screen.dart";
 import "../controllers/auth_controller.dart";
 import "../enum/enum.dart";
 import "../screens/entry_screen.dart";
@@ -32,7 +32,7 @@ class GlobalRouter {
       if (state.matchedLocation == LoginScreen.route) {
         return HomeScreen.route;
       }
-      if (state.matchedLocation == RegisterScreen.route) {
+      if (state.matchedLocation == SignupScreen.route) {
         return HomeScreen.route;
       }
       return null;
@@ -41,7 +41,7 @@ class GlobalRouter {
       if (state.matchedLocation == LoginScreen.route) {
         return null;
       }
-      if (state.matchedLocation == RegisterScreen.route) {
+      if (state.matchedLocation == SignupScreen.route) {
         return null;
       }
       return OnboardingScreen.route;
@@ -76,10 +76,10 @@ class GlobalRouter {
         ),
         GoRoute(
           parentNavigatorKey: _rootNavigatorKey,
-          path: RegisterScreen.route,
-          name: RegisterScreen.name,
+          path: SignupScreen.route,
+          name: SignupScreen.name,
           builder: (context, _) {
-            return const RegisterScreen();
+            return const SignupScreen();
           },
         ),
         ShellRoute(

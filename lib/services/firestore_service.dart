@@ -8,14 +8,9 @@ class FirestoreService {
   final CollectionReference _journalEntriesCollection =
       FirebaseFirestore.instance.collection('journal_entries');
 
-  static Future<DocumentSnapshot<Map<String, dynamic>>> getUserById(
-      String id) async {
-    DocumentSnapshot<Map<String, dynamic>> user =
-        await FirebaseFirestore.instance.collection("users").doc(id).get();
-    if (!user.exists) {
-      throw Exception("The user $id does not exist in database");
-    }
-    return user;
+  Future<UserModel> getUserById(String id) async {
+    final doc = await _usersCollection.doc(id).get();
+    return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
   }
 
   Future<void> addUser(UserModel user) async {
@@ -56,5 +51,16 @@ class FirestoreService {
     } else {
       throw Exception("Journal Entry not found");
     }
+  }
+
+  Stream<UserModel> listenToUser(String userId) {
+    return _usersCollection.doc(userId).snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        return UserModel.fromMap(
+            snapshot.data() as Map<String, dynamic>, snapshot.id);
+      } else {
+        throw Exception("User not found");
+      }
+    });
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -8,28 +10,32 @@ import '../enum/enum.dart';
 class AuthController with ChangeNotifier {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   UserModel? _currentUser;
+  final FirestoreService _firestoreService = GetIt.instance<FirestoreService>();
 
   static void initialize() {
+    GetIt.instance.registerSingleton<FirestoreService>(FirestoreService());
     GetIt.instance.registerSingleton<AuthController>(AuthController());
   }
-
-  static AuthController get instance => GetIt.instance<AuthController>();
 
   static AuthController get I => GetIt.instance<AuthController>();
 
   AuthState state = AuthState.unauthenticated;
+  StreamSubscription? _userSubscription;
 
   AuthController() {
     _auth.authStateChanges().listen((auth.User? user) async {
       if (user == null) {
         state = AuthState.unauthenticated;
         _currentUser = null;
+        _userSubscription?.cancel();
+        _userSubscription = null;
       } else {
         state = AuthState.authenticated;
-        final doc = await FirestoreService.getUserById(user.uid);
-        _currentUser =
-            UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-        notifyListeners();
+        _userSubscription =
+            _firestoreService.listenToUser(user.uid).listen((userModel) {
+          _currentUser = userModel;
+          notifyListeners();
+        });
       }
     });
   }
@@ -43,11 +49,14 @@ class AuthController with ChangeNotifier {
         email: email,
         password: password,
       );
-      final doc = await FirestoreService.getUserById(userCredential.user!.uid);
-      _currentUser =
-          UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-      state = AuthState.authenticated;
-      notifyListeners();
+      _userSubscription?.cancel();
+      _userSubscription = _firestoreService
+          .listenToUser(userCredential.user!.uid)
+          .listen((userModel) {
+        _currentUser = userModel;
+        state = AuthState.authenticated;
+        notifyListeners();
+      });
     } catch (e) {
       throw Exception("Login failed: ${e.toString()}");
     }
@@ -64,11 +73,16 @@ class AuthController with ChangeNotifier {
         email: email,
         profilePictureUrl: '',
       );
-      await FirestoreService().addUser(newUser);
+      await _firestoreService.addUser(newUser);
 
-      state = AuthState.authenticated;
-      _currentUser = newUser;
-      notifyListeners();
+      _userSubscription?.cancel();
+      _userSubscription = _firestoreService
+          .listenToUser(userCredential.user!.uid)
+          .listen((userModel) {
+        _currentUser = userModel;
+        state = AuthState.authenticated;
+        notifyListeners();
+      });
     } catch (e) {
       throw Exception("Registration failed: ${e.toString()}");
     }
@@ -78,19 +92,24 @@ class AuthController with ChangeNotifier {
     await _auth.signOut();
     state = AuthState.unauthenticated;
     _currentUser = null;
+    _userSubscription?.cancel();
+    _userSubscription = null;
     notifyListeners();
   }
 
   Future<void> loadSession() async {
     auth.User? user = _auth.currentUser;
     if (user != null) {
-      final doc = await FirestoreService.getUserById(user.uid);
-      _currentUser =
-          UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-      state = AuthState.authenticated;
+      _userSubscription?.cancel();
+      _userSubscription =
+          _firestoreService.listenToUser(user.uid).listen((userModel) {
+        _currentUser = userModel;
+        state = AuthState.authenticated;
+        notifyListeners();
+      });
     } else {
       state = AuthState.unauthenticated;
+      notifyListeners();
     }
-    notifyListeners();
   }
 }
