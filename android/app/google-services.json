@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "282263287375",
+    "project_id": "basanal-map-journal",
+    "storage_bucket": "basanal-map-journal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282263287375:android:ea2e242295c152242fdc3a",
+        "android_client_info": {
+          "package_name": "com.example.basanal_mad3_final_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfNNVuh-d8UaNIPklph2uC4-ISOhF3lNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
