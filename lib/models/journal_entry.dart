@@ -6,7 +6,7 @@ class JournalEntry {
   String title;
   String content;
   DateTime date;
-  String imageUrl;
+  List<String> imageUrls;
   GeoPoint location;
 
   JournalEntry({
@@ -15,7 +15,7 @@ class JournalEntry {
     required this.title,
     required this.content,
     required this.date,
-    required this.imageUrl,
+    required this.imageUrls,
     required this.location,
   });
 
@@ -25,7 +25,7 @@ class JournalEntry {
       'title': title,
       'content': content,
       'date': date,
-      'imageUrl': imageUrl,
+      'imageUrls': imageUrls,
       'location': location,
     };
   }
@@ -37,7 +37,7 @@ class JournalEntry {
       title: map['title'],
       content: map['content'],
       date: (map['date'] as Timestamp).toDate(),
-      imageUrl: map['imageUrl'],
+      imageUrls: List<String>.from(map['imageUrls']),
       location: map['location'],
     );
   }

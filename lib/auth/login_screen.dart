@@ -69,156 +69,193 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         ),
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
       ),
       body: SafeArea(
-        child: Container(
-          height: SizeConfig.screenHeight,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: TextFormField(
-                    decoration: decoration.copyWith(
-                        labelText: "Username",
-                        labelStyle: const TextStyle(color: Colors.black87)),
-                    focusNode: usernameFn,
-                    controller: username,
-                    onEditingComplete: () {
-                      passwordFn.requestFocus();
-                    },
-                    validator: MultiValidator([
-                      RequiredValidator(
-                          errorText: 'Please fill out the username'),
-                      MaxLengthValidator(32,
-                          errorText: "Username cannot exceed 32 characters"),
-                      EmailValidator(errorText: "Please select a valid email"),
-                    ]).call,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Flexible(
-                  child: TextFormField(
-                    keyboardType: TextInputType.visiblePassword,
-                    obscureText: obfuscate,
-                    decoration: decoration.copyWith(
-                        labelText: "Password",
-                        labelStyle: const TextStyle(color: Colors.black87),
-                        suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                obfuscate = !obfuscate;
-                              });
-                            },
-                            icon: Icon(obfuscate
-                                ? Icons.remove_red_eye_rounded
-                                : CupertinoIcons.eye_slash))),
-                    focusNode: passwordFn,
-                    controller: password,
-                    onEditingComplete: () {
-                      passwordFn.unfocus();
-                    },
-                    validator: MultiValidator([
-                      RequiredValidator(errorText: "Password is required"),
-                      MinLengthValidator(12,
-                          errorText:
-                              "Password must be at least 12 characters long"),
-                      MaxLengthValidator(128,
-                          errorText: "Password cannot exceed 72 characters"),
-                      PatternValidator(
-                          r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+?\-=[\]{};':,.<>]).*$",
-                          errorText:
-                              'Password must contain at least one symbol, one uppercase letter, one lowercase letter, and one number.')
-                    ]).call,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                        style: const ButtonStyle(
-                          overlayColor: WidgetStateColor.transparent,
-                          splashFactory: NoSplash.splashFactory,
-                        ),
-                        onPressed: () {
-                          print('Button pressed');
-                        },
-                        child: const Text('Forgot Password',
-                            style: TextStyle(
-                                fontSize: 13, color: Colors.deepPurpleAccent)))
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.only(top: 3, left: 3),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: const Border(
-                        bottom: BorderSide(color: Colors.black),
-                        top: BorderSide(color: Colors.black),
-                        left: BorderSide(color: Colors.black),
-                        right: BorderSide(color: Colors.black),
-                      )),
-                  child: MaterialButton(
-                    minWidth: double.infinity,
-                    height: 60,
-                    onPressed: () {
-                      onSubmit;
-                    },
-                    color: Colors.deepPurpleAccent,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Form(
+                  key: formKey,
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: Divider(color: Colors.grey.shade400),
+                      TextFormField(
+                        decoration: decoration.copyWith(
+                            labelText: "Username",
+                            labelStyle: const TextStyle(color: Colors.black87)),
+                        focusNode: usernameFn,
+                        controller: username,
+                        onEditingComplete: () {
+                          passwordFn.requestFocus();
+                        },
+                        validator: MultiValidator([
+                          RequiredValidator(
+                              errorText: 'Please fill out the username'),
+                          MaxLengthValidator(32,
+                              errorText:
+                                  "Username cannot exceed 32 characters"),
+                          EmailValidator(
+                              errorText: "Please select a valid email"),
+                        ]).call,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('Or continue with',
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black87)),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: obfuscate,
+                        decoration: decoration.copyWith(
+                            labelText: "Password",
+                            labelStyle: const TextStyle(color: Colors.black87),
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    obfuscate = !obfuscate;
+                                  });
+                                },
+                                icon: Icon(
+                                  obfuscate
+                                      ? CupertinoIcons.eye
+                                      : CupertinoIcons.eye_slash,
+                                  color: Colors.grey.shade500,
+                                ))),
+                        focusNode: passwordFn,
+                        controller: password,
+                        onEditingComplete: () {
+                          passwordFn.unfocus();
+                        },
+                        validator: MultiValidator([
+                          RequiredValidator(errorText: "Password is required"),
+                          MinLengthValidator(12,
+                              errorText:
+                                  "Password must be at least 12 characters long"),
+                          MaxLengthValidator(128,
+                              errorText:
+                                  "Password cannot exceed 72 characters"),
+                          PatternValidator(
+                              r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+?\-=[\]{};':,.<>]).*$",
+                              errorText:
+                                  'Password must contain at least one symbol, one uppercase letter, one lowercase letter, and one number.')
+                        ]).call,
                       ),
-                      Expanded(
-                        child: Divider(color: Colors.grey.shade400),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                              style: const ButtonStyle(
+                                overlayColor: WidgetStateColor.transparent,
+                                splashFactory: NoSplash.splashFactory,
+                              ),
+                              onPressed: () {
+                                print('Button pressed');
+                              },
+                              child: const Text('Forgot Password',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.deepPurpleAccent)))
+                        ],
                       ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.only(top: 3, left: 3),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            border: const Border(
+                              bottom: BorderSide(color: Colors.black),
+                              top: BorderSide(color: Colors.black),
+                              left: BorderSide(color: Colors.black),
+                              right: BorderSide(color: Colors.black),
+                            )),
+                        child: MaterialButton(
+                          minWidth: double.infinity,
+                          height: 60,
+                          onPressed: () {
+                            onSubmit();
+                          },
+                          color: Colors.deepPurpleAccent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Divider(color: Colors.grey.shade400),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Text('Or continue with',
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.black87)),
+                            ),
+                            Expanded(
+                              child: Divider(color: Colors.grey.shade400),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey.shade400, width: 1),
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Image.asset(
+                                'lib/assets/google-icon.webp',
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                            onTap: () {
+                              print('Continue with google');
+                            },
+                          ),
+                          const SizedBox(width: 16),
+                          GestureDetector(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 13),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey.shade400, width: 1),
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Image.asset(
+                                'lib/assets/github-icon.png',
+                                width: 32,
+                                height: 32,
+                              ),
+                            ),
+                            onTap: () {
+                              print('Continue with github');
+                            },
+                          )
+                        ],
+                      )
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400, width: 1),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Image.asset(
-                    'lib/assets/google-icon.webp',
-                    width: 50,
-                    height: 50,
-                  ),
-                )
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

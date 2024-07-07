@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/journal_entry.dart';
 import '../widgets/entry_form.dart';
+import '../dialogs/waiting_dialog.dart';
 
 class EntryScreen extends StatelessWidget {
   final String? entryId;
@@ -21,13 +21,15 @@ class EntryScreen extends StatelessWidget {
               future: FirestoreService().getJournalEntryById(entryId!),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const WaitingDialog(
+                    prompt: "Loading entry...",
+                  );
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData) {
-                  return Center(child: Text('Entry not found'));
+                  return const Center(child: Text('Entry not found'));
                 }
                 final entry = snapshot.data!;
                 return EntryForm(entry: entry);

@@ -1,4 +1,3 @@
-import 'package:basanal_mad3_final_project/auth/onboarding_screen.dart';
 import 'package:basanal_mad3_final_project/controllers/auth_controller.dart';
 import 'package:basanal_mad3_final_project/controllers/user_data_controller.dart';
 import 'package:basanal_mad3_final_project/routing/router.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'screens/test_map_screen.dart';
 import 'utils/utils.dart';
 
 void main() async {
