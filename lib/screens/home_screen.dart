@@ -64,20 +64,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<List<JournalEntry>> _loadJournalEntries(BuildContext context) async {
-    final userId = AuthController.I.currentUser?.id;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User not logged in')),
-      );
-      return [];
-    }
-    return await WaitingDialog.show(
-          context,
-          future: FirestoreService().getJournalEntriesByUserId(userId),
-          prompt: 'Loading journal entries...',
-          color: Colors.white,
-        ) ??
-        [];
-  }
+  // Future<List<JournalEntry>> _loadJournalEntries(BuildContext context) async {
+  //   final userId = AuthController.instance.currentAuthedUser?;
+  //   if (userId == null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('User not logged in')),
+  //     );
+  //     return [];
+  //   }
+  //   return await WaitingDialog.show(
+  //         context,
+  //         future: FirestoreService().getJournalEntriesByUserId(userId),
+  //         prompt: 'Loading journal entries...',
+  //         color: Colors.white,
+  //       ) ??
+  //       [];
+  // }
 }

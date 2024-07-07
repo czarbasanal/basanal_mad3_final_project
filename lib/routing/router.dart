@@ -19,7 +19,6 @@ class GlobalRouter {
   }
 
   static GlobalRouter get instance => GetIt.instance<GlobalRouter>();
-
   static GlobalRouter get I => GetIt.instance<GlobalRouter>();
 
   late GoRouter router;
@@ -28,7 +27,7 @@ class GlobalRouter {
 
   FutureOr<String?> handleRedirect(
       BuildContext context, GoRouterState state) async {
-    if (AuthController.I.state == AuthState.authenticated) {
+    if (AuthController.instance.state == AuthState.authenticated) {
       if (state.matchedLocation == LoginScreen.route) {
         return HomeScreen.route;
       }
@@ -37,7 +36,7 @@ class GlobalRouter {
       }
       return null;
     }
-    if (AuthController.I.state != AuthState.authenticated) {
+    if (AuthController.instance.state != AuthState.authenticated) {
       if (state.matchedLocation == LoginScreen.route) {
         return null;
       }
@@ -56,7 +55,7 @@ class GlobalRouter {
       navigatorKey: _rootNavigatorKey,
       initialLocation: OnboardingScreen.route,
       redirect: handleRedirect,
-      refreshListenable: AuthController.I,
+      refreshListenable: AuthController.instance,
       routes: [
         GoRoute(
           parentNavigatorKey: _rootNavigatorKey,

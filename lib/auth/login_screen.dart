@@ -1,13 +1,12 @@
 import 'package:basanal_mad3_final_project/auth/onboarding_screen.dart';
 import 'package:basanal_mad3_final_project/controllers/auth_controller.dart';
 import 'package:basanal_mad3_final_project/dialogs/waiting_dialog.dart';
-import 'package:basanal_mad3_final_project/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 
-import '../routing/router.dart';
+import '../utils/utils.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String route = "/login";
@@ -47,13 +46,20 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text("Login"),
+        title: const Text(
+          "Login",
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            size: 20,
+          ),
           onPressed: () {
             if (GoRouter.of(context).canPop()) {
               context.pop();
@@ -62,21 +68,12 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           },
         ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          height: 52,
-          child: ElevatedButton(
-            onPressed: () {
-              onSubmit();
-            },
-            child: const Text("Login"),
-          ),
-        ),
+        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: Container(
+          height: SizeConfig.screenHeight,
+          width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Form(
             key: formKey,
@@ -87,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextFormField(
                     decoration: decoration.copyWith(
                         labelText: "Username",
-                        prefixIcon: const Icon(Icons.person)),
+                        labelStyle: const TextStyle(color: Colors.black87)),
                     focusNode: usernameFn,
                     controller: username,
                     onEditingComplete: () {
@@ -103,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 8,
+                  height: 16,
                 ),
                 Flexible(
                   child: TextFormField(
@@ -111,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: obfuscate,
                     decoration: decoration.copyWith(
                         labelText: "Password",
-                        prefixIcon: const Icon(Icons.password),
+                        labelStyle: const TextStyle(color: Colors.black87),
                         suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -140,6 +137,85 @@ class _LoginScreenState extends State<LoginScreen> {
                     ]).call,
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                        style: const ButtonStyle(
+                          overlayColor: WidgetStateColor.transparent,
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                        onPressed: () {
+                          print('Button pressed');
+                        },
+                        child: const Text('Forgot Password',
+                            style: TextStyle(
+                                fontSize: 13, color: Colors.deepPurpleAccent)))
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: EdgeInsets.only(top: 3, left: 3),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: const Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black),
+                      )),
+                  child: MaterialButton(
+                    minWidth: double.infinity,
+                    height: 60,
+                    onPressed: () {
+                      onSubmit;
+                    },
+                    color: Colors.deepPurpleAccent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(color: Colors.grey.shade400),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text('Or continue with',
+                            style:
+                                TextStyle(fontSize: 13, color: Colors.black87)),
+                      ),
+                      Expanded(
+                        child: Divider(color: Colors.grey.shade400),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Image.asset(
+                    'lib/assets/google-icon.webp',
+                    width: 50,
+                    height: 50,
+                  ),
+                )
               ],
             ),
           ),
@@ -151,21 +227,14 @@ class _LoginScreenState extends State<LoginScreen> {
   onSubmit() {
     if (formKey.currentState?.validate() ?? false) {
       WaitingDialog.show(context,
-          future: AuthController.I
-              .login(username.text.trim(), password.text.trim())
-              .then((_) {
-            GlobalRouter.I.router.go(HomeScreen.route);
-          }).catchError((error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Login failed: ${error.toString()}")),
-            );
-          }));
+          future: AuthController.instance
+              .login(username.text.trim(), password.text.trim()));
     }
   }
 
-  final OutlineInputBorder _baseBorder = const OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey),
-    borderRadius: BorderRadius.all(Radius.circular(4)),
+  final OutlineInputBorder _baseBorder = OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.grey.shade400),
+    borderRadius: const BorderRadius.all(Radius.circular(8)),
   );
 
   InputDecoration get decoration => InputDecoration(
@@ -175,12 +244,12 @@ class _LoginScreenState extends State<LoginScreen> {
       errorMaxLines: 3,
       disabledBorder: _baseBorder,
       enabledBorder: _baseBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.black87, width: 1),
+        borderSide: BorderSide(color: Colors.grey.shade400, width: 1),
       ),
       focusedBorder: _baseBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.blueAccent, width: 1),
+        borderSide: const BorderSide(color: Colors.deepPurpleAccent, width: 1),
       ),
       errorBorder: _baseBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.deepOrangeAccent, width: 1),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1),
       ));
 }

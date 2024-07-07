@@ -1,14 +1,10 @@
-import 'package:basanal_mad3_final_project/auth/login_screen.dart';
 import 'package:basanal_mad3_final_project/auth/onboarding_screen.dart';
 import 'package:basanal_mad3_final_project/controllers/auth_controller.dart';
 import 'package:basanal_mad3_final_project/dialogs/waiting_dialog.dart';
-import 'package:basanal_mad3_final_project/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-
-import '../routing/router.dart';
 
 class SignupScreen extends StatefulWidget {
   static const String route = "/register";
@@ -53,16 +49,8 @@ class _SignupScreenState extends State<SignupScreen> {
   void onSubmit() {
     if (formKey.currentState?.validate() ?? false) {
       WaitingDialog.show(context,
-          future: AuthController.I
-              .register(email.text.trim(), password.text.trim())
-              .then((_) {
-            GlobalRouter.I.router.go(HomeScreen.route);
-          }).catchError((error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text("Registration failed: ${error.toString()}")),
-            );
-          }));
+          future: AuthController.instance
+              .register(email.text.trim(), password.text.trim()));
     }
   }
 

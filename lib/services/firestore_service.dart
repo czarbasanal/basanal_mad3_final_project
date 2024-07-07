@@ -1,5 +1,6 @@
 import 'package:basanal_mad3_final_project/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get_it/get_it.dart';
 import '../models/journal_entry.dart';
 
 class FirestoreService {
@@ -8,15 +9,30 @@ class FirestoreService {
   final CollectionReference _journalEntriesCollection =
       FirebaseFirestore.instance.collection('journal_entries');
 
-  Future<UserModel> getUserById(String id) async {
-    final doc = await _usersCollection.doc(id).get();
-    return UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+  static void initialize() {
+    GetIt.instance.registerSingleton<FirestoreService>(FirestoreService());
   }
 
-  Future<void> addUser(UserModel user) async {
-    final doc = await _usersCollection.doc(user.id).get();
-    if (!doc.exists) {
+  Future<void> createUser(UserModel user) async {
+    try {
       await _usersCollection.doc(user.id).set(user.toMap());
+    } catch (e) {
+      print('Error creating user: $e');
+      throw Exception('Failed to create user');
+    }
+  }
+
+  Future<UserModel> getUser(String userId) async {
+    try {
+      final doc = await _usersCollection.doc(userId).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        return UserModel.fromMap(data, doc.id);
+      }
+      throw Exception('User not found');
+    } catch (e) {
+      print('Error fetching user: $e');
+      throw Exception('Failed to fetch user');
     }
   }
 
@@ -51,16 +67,5 @@ class FirestoreService {
     } else {
       throw Exception("Journal Entry not found");
     }
-  }
-
-  Stream<UserModel> listenToUser(String userId) {
-    return _usersCollection.doc(userId).snapshots().map((snapshot) {
-      if (snapshot.exists) {
-        return UserModel.fromMap(
-            snapshot.data() as Map<String, dynamic>, snapshot.id);
-      } else {
-        throw Exception("User not found");
-      }
-    });
   }
 }

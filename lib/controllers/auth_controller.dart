@@ -1,115 +1,114 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user.dart';
 import '../services/firestore_service.dart';
 import '../enum/enum.dart';
+import 'user_data_controller.dart';
 
 class AuthController with ChangeNotifier {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
-  UserModel? _currentUser;
-  final FirestoreService _firestoreService = GetIt.instance<FirestoreService>();
 
   static void initialize() {
-    GetIt.instance.registerSingleton<FirestoreService>(FirestoreService());
     GetIt.instance.registerSingleton<AuthController>(AuthController());
   }
 
-  static AuthController get I => GetIt.instance<AuthController>();
+  static final UserDataController _userDataController =
+      GetIt.instance<UserDataController>();
+  static final FirestoreService _firestoreService =
+      GetIt.instance<FirestoreService>();
+  static AuthController get instance => GetIt.instance<AuthController>();
+
+  late StreamSubscription<User?> currentAuthedUser;
 
   AuthState state = AuthState.unauthenticated;
-  StreamSubscription? _userSubscription;
 
-  AuthController() {
-    _auth.authStateChanges().listen((auth.User? user) async {
-      if (user == null) {
-        state = AuthState.unauthenticated;
-        _currentUser = null;
-        _userSubscription?.cancel();
-        _userSubscription = null;
-      } else {
-        state = AuthState.authenticated;
-        _userSubscription =
-            _firestoreService.listenToUser(user.uid).listen((userModel) {
-          _currentUser = userModel;
-          notifyListeners();
-        });
-      }
-    });
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>[
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
+
+  listen() {
+    currentAuthedUser = _auth.authStateChanges().listen(handleUserChanges);
   }
 
-  UserModel? get currentUser => _currentUser;
+  void handleUserChanges(User? user) {
+    if (user == null) {
+      state = AuthState.unauthenticated;
+    } else {
+      state = AuthState.authenticated;
+    }
+    notifyListeners();
+  }
 
   Future<void> login(String email, String password) async {
     try {
-      auth.UserCredential userCredential =
+      final auth.UserCredential userCredential =
           await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      _userSubscription?.cancel();
-      _userSubscription = _firestoreService
-          .listenToUser(userCredential.user!.uid)
-          .listen((userModel) {
-        _currentUser = userModel;
-        state = AuthState.authenticated;
-        notifyListeners();
-      });
+
+      final UserModel userModel =
+          await _firestoreService.getUser(userCredential.user!.uid);
+      _userDataController.setUserModel(userModel);
     } catch (e) {
-      throw Exception("Login failed: ${e.toString()}");
+      print('Error logging in user: $e');
+      throw Exception('Failed to log in');
     }
+  }
+
+  signInWithGoogle() async {
+    GoogleSignInAccount? gSign = await _googleSignIn.signIn();
+    if (gSign == null) throw Exception("No Signed in account");
+    GoogleSignInAuthentication googleAuth = await gSign.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   Future<void> register(String email, String password) async {
     try {
-      auth.UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final auth.UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      UserModel newUser = UserModel(
+      final UserModel newUser = UserModel(
         id: userCredential.user!.uid,
         name: '',
         email: email,
         profilePictureUrl: '',
       );
-      await _firestoreService.addUser(newUser);
 
-      _userSubscription?.cancel();
-      _userSubscription = _firestoreService
-          .listenToUser(userCredential.user!.uid)
-          .listen((userModel) {
-        _currentUser = userModel;
-        state = AuthState.authenticated;
-        notifyListeners();
-      });
+      await _firestoreService.createUser(newUser);
+      _userDataController.setUserModel(newUser);
     } catch (e) {
-      throw Exception("Registration failed: ${e.toString()}");
+      print('Error registering user: $e');
+      throw Exception('Failed to register');
     }
   }
 
   Future<void> logout() async {
+    if (_googleSignIn.currentUser != null) {
+      _googleSignIn.signOut();
+    }
     await _auth.signOut();
-    state = AuthState.unauthenticated;
-    _currentUser = null;
-    _userSubscription?.cancel();
-    _userSubscription = null;
-    notifyListeners();
+    _userDataController.setUserModel(null);
   }
 
   Future<void> loadSession() async {
-    auth.User? user = _auth.currentUser;
-    if (user != null) {
-      _userSubscription?.cancel();
-      _userSubscription =
-          _firestoreService.listenToUser(user.uid).listen((userModel) {
-        _currentUser = userModel;
-        state = AuthState.authenticated;
-        notifyListeners();
-      });
-    } else {
-      state = AuthState.unauthenticated;
-      notifyListeners();
-    }
+    listen();
+    User? user = FirebaseAuth.instance.currentUser;
+    handleUserChanges(user);
   }
 }

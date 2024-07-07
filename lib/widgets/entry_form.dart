@@ -42,36 +42,36 @@ class _EntryFormState extends State<EntryForm> {
     }
   }
 
-  Future<void> _saveEntry() async {
-    if (_formKey.currentState!.validate()) {
-      String imageUrl = '';
-      if (_image != null) {
-        imageUrl = await StorageService().uploadImage(_image!);
-      }
-      final userId = AuthController.I.currentUser?.id;
-      if (userId != null) {
-        final entry = JournalEntry(
-          id: widget.entry?.id ?? '',
-          userId: userId, // Add userId to the entry
-          title: _titleController.text,
-          content: _contentController.text,
-          date: _selectedDate,
-          imageUrl: imageUrl,
-          location: _location,
-        );
-        if (widget.entry == null) {
-          await FirestoreService().addJournalEntry(entry);
-        } else {
-          await FirestoreService().updateJournalEntry(entry);
-        }
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User not logged in')),
-        );
-      }
-    }
-  }
+  // Future<void> _saveEntry() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     String imageUrl = '';
+  //     if (_image != null) {
+  //       imageUrl = await StorageService().uploadImage(_image!);
+  //     }
+  //     final userId = AuthController.instance.currentUser?.id;
+  //     if (userId != null) {
+  //       final entry = JournalEntry(
+  //         id: widget.entry?.id ?? '',
+  //         userId: userId, // Add userId to the entry
+  //         title: _titleController.text,
+  //         content: _contentController.text,
+  //         date: _selectedDate,
+  //         imageUrl: imageUrl,
+  //         location: _location,
+  //       );
+  //       if (widget.entry == null) {
+  //         await FirestoreService().addJournalEntry(entry);
+  //       } else {
+  //         await FirestoreService().updateJournalEntry(entry);
+  //       }
+  //       Navigator.pop(context);
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('User not logged in')),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -109,10 +109,10 @@ class _EntryFormState extends State<EntryForm> {
               child: Text('Pick Image'),
             ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _saveEntry,
-              child: Text('Save Entry'),
-            ),
+            // ElevatedButton(
+            //   onPressed: _saveEntry,
+            //   child: Text('Save Entry'),
+            // ),
           ],
         ),
       ),

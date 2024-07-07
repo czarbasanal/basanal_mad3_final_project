@@ -2,7 +2,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:basanal_mad3_final_project/auth/login_screen.dart';
 import 'package:basanal_mad3_final_project/auth/signup_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../routing/router.dart';
 
@@ -40,8 +39,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Column(
                       children: <Widget>[
                         FadeInUp(
-                            duration: Duration(milliseconds: 1000),
-                            child: Text(
+                            duration: const Duration(milliseconds: 1000),
+                            child: const Text(
                               "Welcome",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 30),
@@ -50,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           height: MediaQuery.of(context).size.height * 0.02,
                         ),
                         FadeInUp(
-                            duration: Duration(milliseconds: 1200),
+                            duration: const Duration(milliseconds: 1200),
                             child: Text(
                               "Automatic identity verification which enables you to verify your identity",
                               textAlign: TextAlign.center,
@@ -60,10 +59,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ],
                     ),
                     FadeInUp(
-                        duration: Duration(milliseconds: 1400),
+                        duration: const Duration(milliseconds: 1400),
                         child: Container(
                           height: MediaQuery.of(context).size.height * 0.5,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               image: DecorationImage(
                                   image: AssetImage(
                                       'lib/assets/Illustration.png'))),
@@ -71,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Column(
                       children: <Widget>[
                         FadeInUp(
-                            duration: Duration(milliseconds: 1500),
+                            duration: const Duration(milliseconds: 1500),
                             child: MaterialButton(
                               minWidth: double.infinity,
                               height: 60,
@@ -80,24 +79,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 GlobalRouter.I.router.go(LoginScreen.route);
                               },
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(color: Colors.black),
+                                  side: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(50)),
-                              child: Text(
+                              child: const Text(
                                 "Login",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 18),
                               ),
                             )),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         FadeInUp(
-                            duration: Duration(milliseconds: 1600),
+                            duration: const Duration(milliseconds: 1600),
                             child: Container(
-                              padding: EdgeInsets.only(top: 3, left: 3),
+                              padding: const EdgeInsets.only(top: 3, left: 3),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(50),
-                                  border: Border(
+                                  border: const Border(
                                     bottom: BorderSide(color: Colors.black),
                                     top: BorderSide(color: Colors.black),
                                     left: BorderSide(color: Colors.black),
@@ -110,15 +109,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   //sign up route
                                   GlobalRouter.I.router.go(SignupScreen.route);
                                 },
-                                color: Colors.yellow,
+                                color: Colors.deepPurpleAccent,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50)),
-                                child: Text(
+                                child: const Text(
                                   "Sign up",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 18),
+                                      fontSize: 18,
+                                      color: Colors.white),
                                 ),
                               ),
                             ))
