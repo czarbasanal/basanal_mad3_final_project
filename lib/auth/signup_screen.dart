@@ -62,14 +62,13 @@ class _SignupScreenState extends State<SignupScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         centerTitle: true,
-        automaticallyImplyLeading: true,
         title: const Text(
           "Register",
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back_ios_rounded,
             size: 20,
           ),
           onPressed: () {

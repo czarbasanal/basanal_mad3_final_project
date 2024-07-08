@@ -1,4 +1,5 @@
 import "dart:async";
+import "package:basanal_mad3_final_project/screens/journal_entries_screen.dart";
 import "package:flutter/material.dart";
 import "package:get_it/get_it.dart";
 import "package:go_router/go_router.dart";
@@ -115,6 +116,14 @@ class GlobalRouter {
               builder: (context, state) {
                 final entryId = state.pathParameters['id']!;
                 return EntryScreen(entryId: entryId);
+              },
+            ),
+            GoRoute(
+              parentNavigatorKey: _shellNavigatorKey,
+              path: JournalEntriesScreen.route,
+              name: JournalEntriesScreen.name,
+              builder: (context, _) {
+                return JournalEntriesScreen();
               },
             ),
             GoRoute(

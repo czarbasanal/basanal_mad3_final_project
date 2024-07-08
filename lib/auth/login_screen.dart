@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 
-import '../utils/utils.dart';
-
 class LoginScreen extends StatefulWidget {
   static const String route = "/login";
   static const String name = "Login Screen";
@@ -57,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back_ios_rounded,
             size: 20,
           ),
           onPressed: () {

@@ -1,3 +1,5 @@
+import 'package:basanal_mad3_final_project/routing/router.dart';
+import 'package:basanal_mad3_final_project/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/journal_entry.dart';
@@ -12,8 +14,25 @@ class EntryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(entryId == null ? 'New Entry' : 'Edit Entry'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_rounded,
+            size: 20,
+          ),
+          onPressed: () {
+            GlobalRouter.I.router.go(HomeScreen.route);
+          },
+        ),
+        title: Text(
+          entryId == null ? 'Add New Note' : 'Edit Note',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+        ),
       ),
       body: entryId == null
           ? EntryForm()

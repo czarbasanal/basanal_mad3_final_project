@@ -1,5 +1,7 @@
 import 'package:basanal_mad3_final_project/screens/home_screen.dart';
+import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:basanal_mad3_final_project/screens/profile_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../routing/router.dart';
@@ -15,13 +17,24 @@ class ScreenWrapper extends StatefulWidget {
 class _ScreenWrapperState extends State<ScreenWrapper> {
   int index = 0;
 
-  List<String> routes = [HomeScreen.route, ProfileScreen.route];
+  List<String> routes = [
+    HomeScreen.route,
+    JournalEntriesScreen.route,
+    ProfileScreen.route
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.child ?? const Placeholder(),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        selectedFontSize: 13,
+        unselectedFontSize: 13,
+        selectedItemColor: Colors.deepPurpleAccent,
+        unselectedItemColor: Colors.grey.shade600,
         currentIndex: index,
         onTap: (i) {
           setState(() {
@@ -31,8 +44,13 @@ class _ScreenWrapperState extends State<ScreenWrapper> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.map_fill), label: "Map"),
+          BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.square_grid_2x2_fill),
+              label: "Journal"),
+          BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.person_fill), label: "Profile"),
         ],
       ),
     );

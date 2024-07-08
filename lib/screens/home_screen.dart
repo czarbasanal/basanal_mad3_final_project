@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _requestLocationPermission().then((_) => _initializeScreen());
+    _requestLocationPermission().then((_) => _setInitialLocation());
   }
 
   Future<void> _requestLocationPermission() async {
@@ -45,14 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _initializeScreen() async {
-    if (userDataController.journalEntriesNotifier.value.isNotEmpty) {
-      await _setInitialLocation();
-    } else {
-      _updateLoadingState(false);
-    }
-  }
-
   Future<void> _setInitialLocation() async {
     try {
       Position position = await _determinePosition();
@@ -62,11 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
           zoom: 12.0,
         );
         _loadingLocation = false;
+        _updateLoadingState(_loadingLocation);
       });
     } catch (e) {
       print('Error fetching location: $e');
       setState(() {
         _loadingLocation = false;
+        _updateLoadingState(_loadingLocation);
       });
     }
   }
@@ -101,36 +95,41 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Map Journal')),
+      backgroundColor: Colors.white,
       body: _loadingLocation
           ? const WaitingDialog(
               prompt: "Loading...",
               color: Colors.deepPurpleAccent,
             )
-          : ValueListenableBuilder<List<JournalEntry>>(
-              valueListenable: userDataController.journalEntriesNotifier,
-              builder: (context, entries, child) {
-                if (entries.isEmpty) {
-                  return const Center(child: Text('No journal entries found'));
-                }
-                return GoogleMap(
-                  initialCameraPosition: _initialPosition,
-                  markers: entries.map((entry) {
-                    return Marker(
-                      markerId: MarkerId(entry.id),
-                      position: LatLng(
-                          entry.location.latitude, entry.location.longitude),
-                      infoWindow: InfoWindow(
-                          title: entry.title, snippet: entry.content),
-                      onTap: () {
-                        GlobalRouter.I.router.go('/entry/${entry.id}');
-                      },
-                    );
-                  }).toSet(),
-                );
-              },
+          : SafeArea(
+              child: ValueListenableBuilder<List<JournalEntry>>(
+                valueListenable: userDataController.journalEntriesNotifier,
+                builder: (context, entries, child) {
+                  if (entries.isEmpty) {
+                    return const Center(
+                        child: Text('No journal entries found'));
+                  }
+                  return GoogleMap(
+                    initialCameraPosition: _initialPosition,
+                    zoomControlsEnabled: false,
+                    markers: entries.map((entry) {
+                      return Marker(
+                        markerId: MarkerId(entry.id),
+                        position: LatLng(
+                            entry.location.latitude, entry.location.longitude),
+                        infoWindow: InfoWindow(
+                            title: entry.title, snippet: entry.content),
+                        onTap: () {
+                          GlobalRouter.I.router.go('/entry/${entry.id}');
+                        },
+                      );
+                    }).toSet(),
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurpleAccent,
         onPressed: () {
           if (userDataController.currentUserId != null) {
             GlobalRouter.I.router.go('/entry/new');
@@ -139,7 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 message: "Please log in to add a journal entry.");
           }
         },
-        child: const Icon(CupertinoIcons.add),
+        child: const Icon(
+          CupertinoIcons.square_pencil,
+          color: Colors.white,
+          size: 32,
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:basanal_mad3_final_project/screens/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:exif/exif.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:geocoding/geocoding.dart';
 
 import '../controllers/user_data_controller.dart';
 import '../routing/router.dart';
@@ -32,10 +34,11 @@ class _EntryFormState extends State<EntryForm> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _contentController;
-  List<File> _images = [];
-  DateTime _selectedDate = DateTime.now();
+  final List<File> _images = [];
+  final DateTime _selectedDate = DateTime.now();
   late GeoPoint _location;
   List<String> _imageUrls = [];
+  String? _address;
 
   @override
   void initState() {
@@ -45,6 +48,24 @@ class _EntryFormState extends State<EntryForm> {
     _location = widget.entry?.location ?? const GeoPoint(0, 0);
     if (widget.entry != null) {
       _imageUrls = widget.entry!.imageUrls;
+      _getAddressFromGeoPoint(widget.entry!.location);
+    }
+  }
+
+  Future<void> _getAddressFromGeoPoint(GeoPoint geoPoint) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(geoPoint.latitude, geoPoint.longitude);
+      Placemark place = placemarks[0];
+      setState(() {
+        _address =
+            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+      });
+    } catch (e) {
+      print("Error fetching address: $e");
+      setState(() {
+        _address = "Unknown location";
+      });
     }
   }
 
@@ -75,12 +96,14 @@ class _EntryFormState extends State<EntryForm> {
       final long = _convertToDegree(gpsLong.values as List<dynamic>);
       setState(() {
         _location = GeoPoint(lat, long);
+        _getAddressFromGeoPoint(_location);
       });
     } else {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _location = GeoPoint(position.latitude, position.longitude);
+        _getAddressFromGeoPoint(_location);
       });
     }
   }
@@ -112,6 +135,7 @@ class _EntryFormState extends State<EntryForm> {
       setState(() {
         _location =
             GeoPoint(selectedLocation.latitude, selectedLocation.longitude);
+        _getAddressFromGeoPoint(_location);
       });
     }
   }
@@ -185,80 +209,268 @@ class _EntryFormState extends State<EntryForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: ListView(
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
           children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: TextFormField(
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                cursorColor: Colors.black87,
+                cursorErrorColor: Colors.redAccent,
+                controller: _titleController,
+                decoration: InputDecoration(
+                    hintText: 'Title',
+                    hintStyle: TextStyle(
+                        fontSize: 24,
+                        color: Colors.grey.shade400,
+                        fontWeight: FontWeight.w600),
+                    border: InputBorder.none),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
             ),
-            TextFormField(
-              controller: _contentController,
-              decoration: const InputDecoration(labelText: 'Content'),
-              maxLines: 3,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter content';
-                }
-                return null;
-              },
+            if (widget.entry != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(CupertinoIcons.calendar, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(CupertinoIcons.location_solid,
+                            color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _address ?? 'Fetching location...',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: TextFormField(
+                controller: _contentController,
+                cursorColor: Colors.black87,
+                cursorErrorColor: Colors.redAccent,
+                decoration: InputDecoration(
+                    hintText: 'Description',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    border: InputBorder.none),
+                maxLines: 3,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter content';
+                  }
+                  return null;
+                },
+              ),
             ),
             const SizedBox(height: 10),
             if (_imageUrls.isNotEmpty)
               SizedBox(
-                height: 100,
+                height: 400,
                 child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
                   itemCount: _imageUrls.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Image.network(_imageUrls[index]),
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 24),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              _imageUrls[index],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _imageUrls.removeAt(index);
+                              });
+                            },
+                            child: const Icon(
+                              CupertinoIcons.clear,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
             if (_images.isNotEmpty)
               SizedBox(
-                height: 100,
+                height: 360,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
                   itemCount: _images.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Image.file(_images[index]),
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 24.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.file(
+                              _images[index],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _images.removeAt(index);
+                              });
+                            },
+                            child: const Icon(
+                              CupertinoIcons.clear,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
+            const SizedBox(height: 20),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
+                MaterialButton(
                   onPressed: _pickImageFromCamera,
-                  child: const Text('Capture Image'),
+                  splashColor: Colors.grey.shade100,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.photo_camera),
+                      SizedBox(width: 10),
+                      Text('Take a photo')
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
+                const SizedBox(width: 16),
+                MaterialButton(
                   onPressed: _pickImageFromGallery,
-                  child: const Text('Upload Image'),
+                  splashColor: Colors.grey.shade100,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.up_arrow),
+                      SizedBox(width: 10),
+                      Text('Upload')
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _saveEntry,
-              child: const Text('Save Entry'),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Container(
+                padding: const EdgeInsets.only(top: 3, left: 3),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: const Border(
+                      bottom: BorderSide(color: Colors.black),
+                      top: BorderSide(color: Colors.black),
+                      left: BorderSide(color: Colors.black),
+                      right: BorderSide(color: Colors.black),
+                    )),
+                child: MaterialButton(
+                  minWidth: double.infinity,
+                  height: 60,
+                  onPressed: () {
+                    _saveEntry();
+                  },
+                  color: Colors.deepPurpleAccent,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50)),
+                  child: const Text(
+                    "Save",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
             ),
+            if (widget.entry != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 24.0, horizontal: 24.0),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 3, left: 3),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: const Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black),
+                      )),
+                  child: MaterialButton(
+                    minWidth: double.infinity,
+                    height: 60,
+                    onPressed: () {
+                      FirestoreService.instance
+                          .deleteJournalEntry(widget.entry!.id);
+                    },
+                    color: Colors.redAccent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

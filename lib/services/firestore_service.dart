@@ -9,6 +9,8 @@ class FirestoreService {
   final CollectionReference _journalEntriesCollection =
       FirebaseFirestore.instance.collection('journal_entries');
 
+  static FirestoreService get instance => GetIt.instance<FirestoreService>();
+
   static void initialize() {
     GetIt.instance.registerSingleton<FirestoreService>(FirestoreService());
   }

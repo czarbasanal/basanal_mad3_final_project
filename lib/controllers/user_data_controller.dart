@@ -12,6 +12,9 @@ class UserDataController with ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? userStream;
   StreamSubscription<QuerySnapshot>? entriesStream;
 
+  static UserDataController get instance =>
+      GetIt.instance<UserDataController>();
+
   static void initialize() {
     GetIt.instance.registerSingleton<UserDataController>(UserDataController());
   }
