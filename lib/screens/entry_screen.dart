@@ -1,5 +1,5 @@
 import 'package:basanal_mad3_final_project/routing/router.dart';
-import 'package:basanal_mad3_final_project/screens/home_screen.dart';
+import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/journal_entry.dart';
@@ -26,7 +26,7 @@ class EntryScreen extends StatelessWidget {
             size: 20,
           ),
           onPressed: () {
-            GlobalRouter.I.router.go(HomeScreen.route);
+            GlobalRouter.I.router.go(JournalEntriesScreen.route);
           },
         ),
         title: Text(

@@ -39,7 +39,10 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('My Journals'),
+        title: const Text(
+          'My Journals',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         backgroundColor: Colors.white,
       ),
       body: ValueListenableBuilder<List<JournalEntry>>(
@@ -66,6 +69,8 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
                         GlobalRouter.I.router.go('/entry/${entry.id}');
                       },
                       child: Card(
+                        color: Colors.white,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(color: Colors.grey.shade400),
