@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 
+import '../routing/router.dart';
+
 class SignupScreen extends StatefulWidget {
   static const String route = "/register";
   static const String name = "Register";
@@ -87,8 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
               child: SingleChildScrollView(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                physics:
-                    BouncingScrollPhysics(), // Add smooth scrolling physics
+                physics: BouncingScrollPhysics(),
                 child: Form(
                   key: formKey,
                   child: Column(

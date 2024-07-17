@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.deepPurpleAccent,
         onPressed: () {
           if (UserDataController.instance.currentUserId != null) {
-            GlobalRouter.I.router.go('/entry/new');
+            GlobalRouter.I.router.pushNamed('NewEntry');
           } else {
             Info.showSnackbarMessage(context,
                 message: "Please log in to add a journal entry.");

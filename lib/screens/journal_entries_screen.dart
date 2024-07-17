@@ -51,7 +51,7 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
             IconButton(
                 onPressed: () {
                   if (UserDataController.instance.currentUserId != null) {
-                    GlobalRouter.I.router.go('/entry/new');
+                    GlobalRouter.I.router.pushNamed('NewEntry');
                   } else {
                     Info.showSnackbarMessage(context,
                         message: "Please log in to add a journal entry.");
@@ -99,7 +99,7 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
                     final address = snapshot.data ?? 'Fetching location...';
                     return GestureDetector(
                       onTap: () {
-                        GlobalRouter.I.router.go('/entry/${entry.id}');
+                        GlobalRouter.I.router.push('/entry/${entry.id}');
                       },
                       child: Card(
                         color: Colors.white,

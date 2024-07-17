@@ -28,10 +28,7 @@ class EntryScreen extends StatelessWidget {
             size: 20,
           ),
           onPressed: () {
-            // entryId == null
-            //     ? GlobalRouter.I.router.go(HomeScreen.route)
-            //     : GlobalRouter.I.router.go(JournalEntriesScreen.route);
-            GoRouter.of(context).pop();
+            GlobalRouter.I.router.pop();
           },
         ),
         title: Text(

@@ -5,6 +5,7 @@ import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -149,6 +150,7 @@ class _EntryFormState extends State<EntryForm> {
           future: _processSave(userId),
           prompt: "Saving entry...",
         );
+
         GlobalRouter.I.router.go(HomeScreen.route);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -51,7 +51,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         FadeInUp(
                             duration: const Duration(milliseconds: 1200),
                             child: Text(
-                              "Automatic identity verification which enables you to verify your identity",
+                              "Capture your memories and share your adventures. Every place tells a story, and every step is a new chapter.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Colors.grey[700], fontSize: 15),
@@ -65,7 +65,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           decoration: const BoxDecoration(
                               image: DecorationImage(
                                   image: AssetImage(
-                                      'lib/assets/Illustration.png'))),
+                                      'lib/assets/onboarding-image.png'),
+                                  fit: BoxFit.cover)),
                         )),
                     Column(
                       children: <Widget>[
@@ -106,7 +107,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 minWidth: double.infinity,
                                 height: 60,
                                 onPressed: () {
-                                  //sign up route
                                   GlobalRouter.I.router.go(SignupScreen.route);
                                 },
                                 color: Colors.deepPurpleAccent,
