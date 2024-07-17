@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../services/firestore_service.dart';
 import '../enum/enum.dart';
@@ -38,11 +39,14 @@ class AuthController with ChangeNotifier {
     currentAuthedUser = _auth.authStateChanges().listen(handleUserChanges);
   }
 
-  void handleUserChanges(User? user) {
+  void handleUserChanges(User? user) async {
+    final prefs = await SharedPreferences.getInstance();
     if (user == null) {
       state = AuthState.unauthenticated;
+      await prefs.remove('userId');
     } else {
       state = AuthState.authenticated;
+      await prefs.setString('userId', user.uid);
     }
     notifyListeners();
   }
@@ -104,11 +108,25 @@ class AuthController with ChangeNotifier {
     }
     await _auth.signOut();
     _userDataController.setUserModel(null);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
   }
 
   Future<void> loadSession() async {
     listen();
-    User? user = FirebaseAuth.instance.currentUser;
-    handleUserChanges(user);
+    final prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    if (userId != null) {
+      try {
+        final UserModel userModel = await _firestoreService.getUser(userId);
+        _userDataController.setUserModel(userModel);
+        handleUserChanges(FirebaseAuth.instance.currentUser);
+      } catch (e) {
+        print('Error loading user session: $e');
+        handleUserChanges(null);
+      }
+    } else {
+      handleUserChanges(null);
+    }
   }
 }

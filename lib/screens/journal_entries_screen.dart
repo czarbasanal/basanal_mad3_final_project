@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/user_data_controller.dart';
 import '../models/journal_entry.dart';
 import '../routing/router.dart';
+import '../services/information_service.dart';
 
 class JournalEntriesScreen extends StatefulWidget {
   static const route = '/journal_entries';
@@ -27,7 +30,7 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(geoPoint.latitude, geoPoint.longitude);
       Placemark place = placemarks[0];
-      return "${place.locality}, ${place.country}";
+      return "${place.locality}, ${place.subAdministrativeArea}";
     } catch (e) {
       print("Error fetching address: $e");
       return "Unknown location";
@@ -39,15 +42,45 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'My Journals',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        backgroundColor: Colors.white,
-      ),
+          title: const Text(
+            'My Journals',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  if (UserDataController.instance.currentUserId != null) {
+                    GlobalRouter.I.router.go('/entry/new');
+                  } else {
+                    Info.showSnackbarMessage(context,
+                        message: "Please log in to add a journal entry.");
+                  }
+                },
+                icon: const Icon(
+                  CupertinoIcons.add,
+                  size: 30,
+                )),
+          ]),
       body: ValueListenableBuilder<List<JournalEntry>>(
         valueListenable: userDataController.journalEntriesNotifier,
         builder: (context, entries, child) {
+          if (entries.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                child: Text(
+                  "“Start journaling today; let your thoughts and dreams find a home on paper.”",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ),
+            );
+          }
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(
@@ -75,69 +108,75 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(color: Colors.grey.shade400),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
-                              ),
-                              child: CachedNetworkImage(
-                                imageUrl: entry.imageUrls.isNotEmpty
-                                    ? entry.imageUrls.first
-                                    : 'https://via.placeholder.com/150',
-                                height: 120,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) =>
-                                    const SpinKitChasingDots(
-                                  color: Colors.grey,
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
                                 ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                entry.title,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                child: CachedNetworkImage(
+                                  imageUrl: entry.imageUrls.isNotEmpty
+                                      ? entry.imageUrls.first
+                                      : 'https://via.placeholder.com/150',
+                                  height: 120,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) =>
+                                      const SpinKitChasingDots(
+                                    color: Colors.grey,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                "${entry.date.day}/${entry.date.month}/${entry.date.year}",
-                                style: const TextStyle(color: Colors.grey),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  entry.title,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                address,
-                                style: const TextStyle(color: Colors.grey),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  DateFormat.yMMMMd().format(entry.date),
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                entry.content,
-                                style: const TextStyle(color: Colors.black87),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  address,
+                                  style: const TextStyle(color: Colors.grey),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Flexible(
+                                  child: Text(
+                                    entry.content,
+                                    style:
+                                        const TextStyle(color: Colors.black87),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
                         ),
                       ),
                     );

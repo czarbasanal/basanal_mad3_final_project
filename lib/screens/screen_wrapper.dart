@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../routing/router.dart';
+import '../controllers/user_data_controller.dart';
+import '../services/information_service.dart';
 
 class ScreenWrapper extends StatefulWidget {
   final Widget? child;
@@ -30,6 +32,7 @@ class _ScreenWrapperState extends State<ScreenWrapper> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         elevation: 0,
+        useLegacyColorScheme: false,
         backgroundColor: Colors.white,
         selectedFontSize: 13,
         unselectedFontSize: 13,
@@ -45,12 +48,17 @@ class _ScreenWrapperState extends State<ScreenWrapper> {
         },
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.map_fill), label: "Map"),
+              icon: Icon(CupertinoIcons.map),
+              activeIcon: Icon(CupertinoIcons.map_fill),
+              label: "Map"),
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.square_grid_2x2_fill),
+              icon: Icon(CupertinoIcons.square_grid_2x2),
+              activeIcon: Icon(CupertinoIcons.square_grid_2x2_fill),
               label: "Journal"),
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person_fill), label: "Profile"),
+              icon: Icon(CupertinoIcons.person),
+              activeIcon: Icon(CupertinoIcons.person_fill),
+              label: "Profile"),
         ],
       ),
     );

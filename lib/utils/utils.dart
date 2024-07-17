@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
 
+class Constants {
+  static Color primaryColor = const Color(0xFF006491);
+  static Color textColorLightTheme = const Color(0xFF0D0D0E);
+
+  static Color secondaryColor80LightTheme = const Color(0xFF202225);
+  static Color secondaryColor60LightTheme = const Color(0xFF313336);
+  static Color secondaryColor40LightTheme = const Color(0xFF585858);
+  static Color secondaryColor20LightTheme = const Color(0xFF787F84);
+  static Color secondaryColor10LightTheme = const Color(0xFFEEEEEE);
+  static Color secondaryColor5LightTheme = const Color(0xFFF8F8F8);
+
+  static const defaultPadding = 16.0;
+}
+
 class SizeConfig {
   static MediaQueryData? _mediaQueryData;
   static double screenWidth = 0;

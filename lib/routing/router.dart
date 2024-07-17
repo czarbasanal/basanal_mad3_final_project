@@ -19,7 +19,6 @@ class GlobalRouter {
     GetIt.instance.registerSingleton<GlobalRouter>(GlobalRouter());
   }
 
-  static GlobalRouter get instance => GetIt.instance<GlobalRouter>();
   static GlobalRouter get I => GetIt.instance<GlobalRouter>();
 
   late GoRouter router;

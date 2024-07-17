@@ -40,9 +40,16 @@ class ProfileScreen extends StatelessWidget {
                         width: 100, height: 100);
                 return Column(
                   children: <Widget>[
-                    Text('Name: ${user.name}'),
-                    Text('Email: ${user.email}'),
-                    profileImage,
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: profileImage),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      user.email,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 40.0, horizontal: 24),

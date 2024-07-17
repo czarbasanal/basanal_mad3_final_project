@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:basanal_mad3_final_project/screens/home_screen.dart';
+import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:exif/exif.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -35,7 +35,7 @@ class _EntryFormState extends State<EntryForm> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   final List<File> _images = [];
-  final DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
   late GeoPoint _location;
   List<String> _imageUrls = [];
   String? _address;
@@ -48,6 +48,7 @@ class _EntryFormState extends State<EntryForm> {
     _location = widget.entry?.location ?? const GeoPoint(0, 0);
     if (widget.entry != null) {
       _imageUrls = widget.entry!.imageUrls;
+      _selectedDate = widget.entry!.date;
       _getAddressFromGeoPoint(widget.entry!.location);
     }
   }
@@ -59,7 +60,7 @@ class _EntryFormState extends State<EntryForm> {
       Placemark place = placemarks[0];
       setState(() {
         _address =
-            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+            "${place.subLocality}, ${place.locality}, ${place.subAdministrativeArea}, ${place.country}";
       });
     } catch (e) {
       print("Error fetching address: $e");
@@ -76,43 +77,17 @@ class _EntryFormState extends State<EntryForm> {
       setState(() {
         _images.add(File(pickedFile.path));
       });
-      await _extractLocationFromImage(File(pickedFile.path));
+      await _getCurrentLocation();
     }
   }
 
-  Future<void> _extractLocationFromImage(File image) async {
-    final bytes = await image.readAsBytes();
-    final data = await readExifFromBytes(bytes);
-
-    if (data.isEmpty) {
-      print("No EXIF information found");
-      return;
-    }
-
-    if (data.containsKey('GPSLatitude') && data.containsKey('GPSLongitude')) {
-      final gpsLat = data['GPSLatitude']!;
-      final gpsLong = data['GPSLongitude']!;
-      final lat = _convertToDegree(gpsLat.values as List<dynamic>);
-      final long = _convertToDegree(gpsLong.values as List<dynamic>);
-      setState(() {
-        _location = GeoPoint(lat, long);
-        _getAddressFromGeoPoint(_location);
-      });
-    } else {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _location = GeoPoint(position.latitude, position.longitude);
-        _getAddressFromGeoPoint(_location);
-      });
-    }
-  }
-
-  double _convertToDegree(List<dynamic> values) {
-    double degrees = values[0].toDouble();
-    double minutes = values[1].toDouble() / 60;
-    double seconds = values[2].toDouble() / 3600;
-    return degrees + minutes + seconds;
+  Future<void> _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _location = GeoPoint(position.latitude, position.longitude);
+      _getAddressFromGeoPoint(_location);
+    });
   }
 
   Future<void> _pickImageFromGallery() async {
@@ -167,14 +142,14 @@ class _EntryFormState extends State<EntryForm> {
 
   Future<void> _saveEntry() async {
     if (_formKey.currentState!.validate()) {
-      final userId = GetIt.instance<UserDataController>().currentUserId;
+      final userId = UserDataController.instance.currentUserId;
       if (userId != null) {
         await WaitingDialog.show(
           context,
           future: _processSave(userId),
           prompt: "Saving entry...",
         );
-        GlobalRouter.instance.router.go(HomeScreen.route);
+        GlobalRouter.I.router.go(HomeScreen.route);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('User not logged in')),
@@ -204,6 +179,20 @@ class _EntryFormState extends State<EntryForm> {
       await FirestoreService().addJournalEntry(entry);
     } else {
       await FirestoreService().updateJournalEntry(entry);
+    }
+  }
+
+  Future<void> _deleteEntry() async {
+    if (widget.entry != null) {
+      await WaitingDialog.show(
+        context,
+        future: FirestoreService().deleteJournalEntry(widget.entry!.id),
+        prompt: "Deleting entry...",
+      );
+      GlobalRouter.I.router.go(JournalEntriesScreen.route);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Journal Entry Deleted')),
+      );
     }
   }
 
@@ -245,10 +234,11 @@ class _EntryFormState extends State<EntryForm> {
                   children: [
                     Row(
                       children: [
-                        const Icon(CupertinoIcons.calendar, color: Colors.grey),
+                        const Icon(CupertinoIcons.calendar,
+                            color: Colors.deepPurpleAccent),
                         const SizedBox(width: 8),
                         Text(
-                          "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
+                          DateFormat.yMMMMd().format(_selectedDate),
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ],
@@ -257,7 +247,7 @@ class _EntryFormState extends State<EntryForm> {
                     Row(
                       children: [
                         const Icon(CupertinoIcons.location_solid,
-                            color: Colors.grey),
+                            color: Colors.deepPurpleAccent),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -453,10 +443,7 @@ class _EntryFormState extends State<EntryForm> {
                   child: MaterialButton(
                     minWidth: double.infinity,
                     height: 60,
-                    onPressed: () {
-                      FirestoreService.instance
-                          .deleteJournalEntry(widget.entry!.id);
-                    },
+                    onPressed: _deleteEntry,
                     color: Colors.redAccent,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
