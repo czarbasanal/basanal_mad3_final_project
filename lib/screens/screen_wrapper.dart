@@ -3,6 +3,7 @@ import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:basanal_mad3_final_project/screens/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../routing/router.dart';
 import '../controllers/user_data_controller.dart';
@@ -44,6 +45,7 @@ class _ScreenWrapperState extends State<ScreenWrapper> {
             index = i;
 
             GlobalRouter.I.router.go(routes[i]);
+            // context.go(routes[i]);
           });
         },
         items: const [

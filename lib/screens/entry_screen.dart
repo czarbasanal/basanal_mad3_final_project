@@ -1,8 +1,5 @@
 import 'package:basanal_mad3_final_project/routing/router.dart';
-import 'package:basanal_mad3_final_project/screens/home_screen.dart';
-import 'package:basanal_mad3_final_project/screens/journal_entries_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../services/firestore_service.dart';
 import '../models/journal_entry.dart';
 import '../widgets/entry_form.dart';

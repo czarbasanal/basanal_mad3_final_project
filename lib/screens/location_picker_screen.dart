@@ -94,12 +94,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                   child: GooglePlaceAutoCompleteTextField(
                     textEditingController: controller,
                     googleAPIKey: googleAPIKey,
+                    containerVerticalPadding: 0,
+                    containerHorizontalPadding: 0,
+                    boxDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey, width: 1)),
                     inputDecoration: InputDecoration(
                       hintText: 'Search location...',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -146,7 +151,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     },
                     seperatedBuilder: const Divider(),
                     isCrossBtnShown: true,
-                    containerHorizontalPadding: 10,
                     placeType: PlaceType.geocode,
                   ),
                 ),

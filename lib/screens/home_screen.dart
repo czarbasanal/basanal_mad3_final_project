@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -93,49 +94,71 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (entry.imageUrls.isNotEmpty)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      entry.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    entry.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(CupertinoIcons.clear))
-                  ],
-                ),
-              const SizedBox(height: 12),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(entry.imageUrls.first),
-                    fit: BoxFit.cover,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(CupertinoIcons.clear),
+                  ),
+                ],
               ),
+              const SizedBox(height: 12),
+              entry.imageUrls.length > 1
+                  ? CarouselSlider(
+                      options: CarouselOptions(
+                        height: 200,
+                        enableInfiniteScroll: false,
+                        enlargeCenterPage: false,
+                      ),
+                      items: entry.imageUrls.map((url) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            image: DecorationImage(
+                              image: NetworkImage(url),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  : Container(
+                      height: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(entry.imageUrls.first),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   const Icon(CupertinoIcons.location_solid,
                       color: Colors.deepPurpleAccent),
                   const SizedBox(width: 4),
-                  Text(
-                    address,
-                    style: const TextStyle(
-                      color: Colors.grey,
+                  Expanded(
+                    child: Text(
+                      address,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
                   ),
                 ],
               ),

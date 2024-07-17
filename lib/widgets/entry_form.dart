@@ -151,7 +151,7 @@ class _EntryFormState extends State<EntryForm> {
           prompt: "Saving entry...",
         );
 
-        GlobalRouter.I.router.go(HomeScreen.route);
+        GlobalRouter.I.router.go(JournalEntriesScreen.route);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('User not logged in')),
